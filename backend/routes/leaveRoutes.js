@@ -26,4 +26,21 @@ router.get("/my", auth, async (req, res) => {
   }
 });
 
+// Get All Leaves (Admin Only)
+router.get("/all", auth, async (req, res) => {
+  try {
+    // Check if admin
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const leaves = await Leave.find()
+      .populate("employee", "name email");
+
+    res.json(leaves);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;

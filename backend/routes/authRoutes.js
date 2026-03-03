@@ -53,19 +53,23 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // find user
+    console.log("Entered Email:", email);
+    console.log("Entered Password:", password);
+
     const user = await User.findOne({ email });
+    console.log("User from DB:", user);
+
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Invalid credentials - user not found" });
     }
 
-    // compare password
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log("Password Match Result:", isMatch);
+
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Invalid credentials - password mismatch" });
     }
 
-    // create token
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
@@ -74,12 +78,33 @@ router.post("/login", async (req, res) => {
 
     res.json({
       token,
-      role: user.role
+      user: {
+        id: user._id,
+        role: user.role,
+        email: user.email,
+        name: user.name
+      }
     });
 
   } catch (err) {
+    console.log("Login Error:", err);
     res.status(500).json({ message: err.message });
   }
 });
+
+
+// router.post("/login", async (req, res) => {
+//   const { email, password } = req.body;
+
+//   console.log("Typed password:", password);
+
+//   const user = await User.findOne({ email });
+//   console.log("Stored hash:", user?.password);
+
+//   const isMatch = await bcrypt.compare(password, user.password);
+//   console.log("Match result:", isMatch);
+
+//   res.json({ isMatch });
+// });
 
 module.exports = router;
