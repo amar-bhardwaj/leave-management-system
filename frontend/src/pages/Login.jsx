@@ -1,24 +1,33 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import API from "../utils/api";
+import { useNavigate } from "react-router-dom";
+import API from "../api"; // Make sure filename matches (API.js or api.js)
 
 function Login() {
-  const [form, setForm] = useState({
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
 
-  const navigate = useNavigate();
-
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await API.post("/auth/login", form);
+      const res = await API.post("/auth/login", formData);
+
+      // Save token
       localStorage.setItem("token", res.data.token);
+
+      // Since backend sends role directly
+      localStorage.setItem("role", res.data.role);
 
       if (res.data.role === "admin") {
         navigate("/admin");
@@ -26,24 +35,36 @@ function Login() {
         navigate("/employee");
       }
     } catch (err) {
-      alert(err.response?.data?.message || "Error");
+      console.log(err);
+      alert("Invalid credentials");
     }
   };
 
   return (
-    <div className="container">
+    <div style={{ padding: "40px" }}>
       <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input name="email" placeholder="Email" onChange={handleChange} />
-        <br />
-        <input name="password" type="password" placeholder="Password" onChange={handleChange} />
-        <br />
+
+      <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+        />
+        <br /><br />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+        />
+        <br /><br />
+
         <button type="submit">Login</button>
       </form>
-
-      <p>
-        Don't have account? <Link to="/register">Register</Link>
-      </p>
     </div>
   );
 }

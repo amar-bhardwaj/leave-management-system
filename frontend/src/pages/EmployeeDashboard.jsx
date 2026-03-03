@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import API from "../utils/api";
+import API from "../api";
 
 function EmployeeDashboard() {
     const [form, setForm] = useState({
@@ -48,6 +48,8 @@ function EmployeeDashboard() {
             }}>
                 Logout
             </button>
+
+            
             <h2>Employee Dashboard</h2>
 
             <h3>Apply Leave</h3>
