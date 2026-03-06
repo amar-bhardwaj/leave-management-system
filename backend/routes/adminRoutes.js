@@ -9,7 +9,7 @@ router.get("/leaves", auth, async (req, res) => {
   }
 
   try {
-    const leaves = await Leave.find().populate("employee");
+    const leaves = await Leave.find().sort({ createdAt: -1 }).populate("employee");
     res.json(leaves);
   } catch (error) {
     res.status(500).json({ message: error.message });
