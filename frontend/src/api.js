@@ -4,7 +4,6 @@ const API = axios.create({
   baseURL: "https://leave-management-system-gfzm.onrender.com/api"
 });
 
-// attach token automatically
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
   if (token) {

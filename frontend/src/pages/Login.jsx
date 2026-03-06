@@ -18,27 +18,29 @@ function Login() {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const res = await API.post("/auth/login", formData);
+  try {
+    const res = await API.post("/auth/login", formData);
 
-      // Save token
-      localStorage.setItem("token", res.data.token);
+    // Save token
+    localStorage.setItem("token", res.data.token);
 
-      // Since backend sends role directly
-      localStorage.setItem("role", res.data.role);
+    // Save full user
+    localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      if (res.data.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/employee");
-      }
-    } catch (err) {
-      console.log(err);
-      alert("Invalid credentials");
+    // Redirect based on role
+    if (res.data.user.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/employee");
     }
-  };
+
+  } catch (err) {
+    console.log(err);
+    alert("Invalid credentials");
+  }
+};
 
   return (
     <div style={{ padding: "40px" }}>

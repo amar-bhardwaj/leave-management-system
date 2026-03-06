@@ -1,0 +1,107 @@
+body{
+font-family: Arial, Helvetica, sans-serif;
+margin:0;
+background:#f4f8ff;
+}
+
+.admin-container{
+padding:20px;
+}
+
+.header{
+background:#0d6efd;
+color:white;
+padding:15px 30px;
+display:flex;
+align-items:center;
+}
+
+.logo-section{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.logo-section img{
+width:40px;
+}
+
+.title{
+margin-top:20px;
+color:#0d6efd;
+}
+
+.controls{
+display:flex;
+gap:30px;
+margin:20px 0;
+}
+
+.controls select{
+padding:6px;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+.table-container{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+background:#0d6efd;
+color:white;
+padding:10px;
+}
+
+td{
+padding:10px;
+border-bottom:1px solid #eee;
+}
+
+.status{
+font-weight:bold;
+}
+
+.status.Pending{
+color:orange;
+}
+
+.status.Approved{
+color:green;
+}
+
+.status.Rejected{
+color:red;
+}
+
+button{
+padding:6px 10px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+.approve-btn{
+background:#198754;
+color:white;
+margin-right:5px;
+}
+
+.reject-btn{
+background:#dc3545;
+color:white;
+}
+
+.footer{
+margin-top:40px;
+text-align:center;
+color:#777;
+}
