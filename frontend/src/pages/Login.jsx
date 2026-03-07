@@ -1,74 +1,141 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import API from "../api"; // Make sure filename matches (API.js or api.js)
 
 function Login() {
+
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: ""
-  });
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async (e) => {
-  e.preventDefault();
 
-  try {
-    const res = await API.post("/auth/login", formData);
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    // Save token
-    localStorage.setItem("token", res.data.token);
+    try {
 
-    // Save full user
-    localStorage.setItem("user", JSON.stringify(res.data.user));
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        {
+          phone,
+          password
+        }
+      );
 
-    // Redirect based on role
-    if (res.data.user.role === "admin") {
-      navigate("/admin");
-    } else {
-      navigate("/employee");
+      // Save authentication
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role);
+
+      // Redirect based on role
+      if (res.data.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/employee/dashboard");
+      }
+
+    } catch (err) {
+
+      setError(
+        err.response?.data?.message || "Invalid phone or password"
+      );
+
+    } finally {
+      setLoading(false);
     }
 
-  } catch (err) {
-    console.log(err);
-    alert("Invalid credentials");
-  }
-};
+  };
 
   return (
-    <div style={{ padding: "40px" }}>
-      <h2>Login</h2>
 
-      <form onSubmit={handleLogin}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        background: "#f4f6f9"
+      }}
+    >
+
+      <form
+        onSubmit={handleLogin}
+        style={{
+          background: "white",
+          padding: "30px",
+          borderRadius: "8px",
+          width: "320px",
+          boxShadow: "0 0 10px rgba(0,0,0,0.1)"
+        }}
+      >
+
+        <h2 style={{ textAlign: "center" }}>
+          Employee Login
+        </h2>
+
+        {error && (
+          <p style={{ color: "red", fontSize: "14px" }}>
+            {error}
+          </p>
+        )}
+
         <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
+          type="text"
+          placeholder="Phone Number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          required
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginTop: "15px",
+            border: "1px solid #ccc",
+            borderRadius: "4px"
+          }}
         />
-        <br /><br />
 
         <input
           type="password"
-          name="password"
           placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginTop: "15px",
+            border: "1px solid #ccc",
+            borderRadius: "4px"
+          }}
         />
-        <br /><br />
 
-        <button type="submit">Login</button>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginTop: "20px",
+            background: "#1976d2",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+          }}
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+
       </form>
+
     </div>
+
   );
+
 }
 
 export default Login;

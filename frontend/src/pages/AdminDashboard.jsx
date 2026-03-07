@@ -1,157 +1,155 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./AdminDashboard.css";
+import AdminSidebar from "../components/AdminSidebar";
 
 function AdminDashboard() {
-  const [leaves, setLeaves] = useState([]);
-  const [filter, setFilter] = useState("All");
-  const [sortOrder, setSortOrder] = useState("Newest");
+
+  const [stats, setStats] = useState({
+    employees: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0
+  });
+
+  const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    fetchLeaves();
-  }, []);
 
-  const fetchLeaves = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/leaves/all", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    const fetchStats = async () => {
 
-      // Sort newest first
-      const sortedLeaves = res.data.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+      try {
 
-      setLeaves(sortedLeaves);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+        const headers = {
+          Authorization: `Bearer ${token}`
+        };
 
-  const updateStatus = async (id, status) => {
-    try {
-      await axios.put(
-        `http://localhost:5000/api/leaves/${id}`,
-        { status },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      fetchLeaves();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const filteredLeaves =
-    filter === "All"
-      ? leaves
-      : leaves.filter((leave) => leave.status === filter);
-
-  const sortedLeaves =
-    sortOrder === "Newest"
-      ? [...filteredLeaves].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        )
-      : [...filteredLeaves].sort(
-          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        const employeesRes = await axios.get(
+          "http://localhost:5000/api/users/all",
+          { headers }
         );
 
+        const leavesRes = await axios.get(
+          "http://localhost:5000/api/leaves/all",
+          { headers }
+        );
+
+        const leaves = leavesRes.data;
+
+        const pending = leaves.filter(l => l.status === "pending").length;
+        const approved = leaves.filter(l => l.status === "approved").length;
+        const rejected = leaves.filter(l => l.status === "rejected").length;
+
+        setStats({
+          employees: employeesRes.data.length,
+          pending,
+          approved,
+          rejected
+        });
+
+      } catch (error) {
+
+        console.log("Dashboard Error:", error);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+    fetchStats();
+
+  }, [token]);
+
+
+  if (loading) {
+    return <div style={{ padding: "40px" }}>Loading Dashboard...</div>;
+  }
+
   return (
-    <div className="admin-container">
-      
-      {/* HEADER */}
-      <header className="header">
-        <div className="logo-section">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-            alt="logo"
-          />
-          <h2>Smart Leave Manager</h2>
-        </div>
-      </header>
 
-      <h1 className="title">Admin Dashboard</h1>
+    <div style={{ background: "#f4f6f9", minHeight: "100vh" }}>
 
-      {/* FILTER + SORT */}
-      <div className="controls">
-        <div>
-          <label>Filter:</label>
-          <select onChange={(e) => setFilter(e.target.value)}>
-            <option value="All">All</option>
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-          </select>
+      <AdminSidebar />
+
+      <div
+        style={{
+          marginLeft: "240px",
+          padding: "30px"
+        }}
+      >
+
+        <h2 style={{ marginBottom: "30px" }}>
+          Admin Dashboard
+        </h2>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 260px)",
+            gap: "20px"
+          }}
+        >
+
+          <div
+            style={{
+              background: "#2196f3",
+              color: "white",
+              padding: "20px",
+              borderRadius: "6px"
+            }}
+          >
+            <h4>Total Employees</h4>
+            <h2>{stats.employees}</h2>
+          </div>
+
+          <div
+            style={{
+              background: "#ff9800",
+              color: "white",
+              padding: "20px",
+              borderRadius: "6px"
+            }}
+          >
+            <h4>Pending Leaves</h4>
+            <h2>{stats.pending}</h2>
+          </div>
+
+          <div
+            style={{
+              background: "#4caf50",
+              color: "white",
+              padding: "20px",
+              borderRadius: "6px"
+            }}
+          >
+            <h4>Approved Leaves</h4>
+            <h2>{stats.approved}</h2>
+          </div>
+
+          <div
+            style={{
+              background: "#f44336",
+              color: "white",
+              padding: "20px",
+              borderRadius: "6px"
+            }}
+          >
+            <h4>Rejected Leaves</h4>
+            <h2>{stats.rejected}</h2>
+          </div>
+
         </div>
 
-        <div>
-          <label>Sort:</label>
-          <select onChange={(e) => setSortOrder(e.target.value)}>
-            <option value="Newest">Newest First</option>
-            <option value="Oldest">Oldest First</option>
-          </select>
-        </div>
       </div>
 
-      {/* LEAVE TABLE */}
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Employee</th>
-              <th>Reason</th>
-              <th>From</th>
-              <th>To</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {sortedLeaves.map((leave) => (
-              <tr key={leave._id}>
-                <td>{leave.employee?.name || "Employee"}</td>
-                <td>{leave.reason}</td>
-                <td>{leave.fromDate}</td>
-                <td>{leave.toDate}</td>
-                <td className={`status ${leave.status}`}>
-                  {leave.status}
-                </td>
-
-                <td>
-                  {leave.status === "Pending" && (
-                    <>
-                      <button
-                        className="approve-btn"
-                        onClick={() =>
-                          updateStatus(leave._id, "Approved")
-                        }
-                      >
-                        Approve
-                      </button>
-
-                      <button
-                        className="reject-btn"
-                        onClick={() =>
-                          updateStatus(leave._id, "Rejected")
-                        }
-                      >
-                        Reject
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-     
     </div>
+
   );
+
 }
 
 export default AdminDashboard;
