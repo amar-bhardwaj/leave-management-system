@@ -1,45 +1,60 @@
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
+
 const Leave = require("../models/Leave");
-const auth = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 
-// Apply Leave
-router.post("/apply", auth, async (req, res) => {
+/*
+APPLY LEAVE
+POST /api/leaves/apply
+Employee creates a leave request
+*/
+router.post("/apply", authMiddleware, async (req, res) => {
   try {
-    const leave = await Leave.create({
-      ...req.body,
-      employee: req.user.id
-    });
+    const { leaveType, halfDayType, fromDate, toDate, reason } = req.body;
 
-    res.json(leave);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Get My Leaves
-router.get("/my", auth, async (req, res) => {
-  try {
-    const leaves = await Leave.find({ employee: req.user.id });
-    res.json(leaves);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Get All Leaves (Admin Only)
-router.get("/all", auth, async (req, res) => {
-  try {
-    // Check if admin
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Access denied" });
+    if (!fromDate || !toDate || !reason) {
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const leaves = await Leave.find()
-      .populate("employee", "name email");
+    const leave = new Leave({
+      employee: req.user.id,
+      leaveType,
+      halfDayType,
+      fromDate,
+      toDate,
+      reason,
+      status: "Pending"
+    });
+
+    const savedLeave = await leave.save();
+
+    res.json(savedLeave);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error applying leave" });
+  }
+});
+
+/*
+GET MY LEAVES
+GET /api/leaves/my
+Employee can view their leave history
+*/
+router.get("/my", authMiddleware, async (req, res) => {
+  try {
+    const leaves = await Leave.find({
+      employee: req.user.id
+    })
+      .populate("employee", "name phone")
+      .sort({ createdAt: -1 });
 
     res.json(leaves);
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: "Error fetching leaves" });
   }
 });
 
