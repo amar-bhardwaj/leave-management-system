@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const authMiddleware = require("../middleware/authMiddleware");
+const adminMiddleware = require("../middleware/adminMiddleware");
 const bcrypt = require("bcryptjs");
 
 
@@ -21,18 +22,26 @@ router.get("/all", authMiddleware, async (req, res) => {
 
 
 // CREATE EMPLOYEE
-router.post("/create", authMiddleware, async (req, res) => {
+router.post("/create", authMiddleware, adminMiddleware, async (req, res) => {
 
   try {
 
     const { name, phone, password } = req.body;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    if (!name || !phone || !password) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+
+    const existing = await User.findOne({ phone });
+
+    if (existing) {
+      return res.status(400).json({ message: "Phone already exists" });
+    }
 
     const employee = new User({
       name,
       phone,
-      password: hashedPassword,
+      password,
       role: "employee"
     });
 
@@ -42,7 +51,8 @@ router.post("/create", authMiddleware, async (req, res) => {
 
   } catch (error) {
 
-    res.status(500).json({ message: "Error creating employee" });
+    console.error("Create employee error:", error);
+    res.status(500).json({ message: "Server error" });
 
   }
 
@@ -70,12 +80,9 @@ router.put("/reset-password/:id", authMiddleware, async (req, res) => {
 
     const { password } = req.body;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await User.findByIdAndUpdate(
-      req.params.id,
-      { password: hashedPassword }
-    );
+    await User.findByIdAndUpdate(req.params.userId, {
+      password: newPassword
+    });
 
     res.json({ message: "Password reset successful" });
 

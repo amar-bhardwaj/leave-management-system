@@ -1,9 +1,7 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
-
 const User = require("../models/User");
 const Leave = require("../models/Leave");
-
 const auth = require("../middleware/authMiddleware");
 
 /*
@@ -90,13 +88,18 @@ router.put("/reset-password/:userId", auth, async (req, res) => {
   try {
     const { newPassword } = req.body;
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const user = await User.findById(req.params.userId);
 
-    await User.findByIdAndUpdate(req.params.userId, {
-      password: hashedPassword
-    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.password = newPassword;
+
+    await user.save();
 
     res.json({ message: "Password reset successfully" });
+
 
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -136,7 +139,7 @@ router.put("/leaves/:id/approve", auth, async (req, res) => {
       return res.status(404).json({ message: "Leave not found" });
     }
 
-    leave.status = "Approved";
+    leave.status = "approved";
 
     await leave.save();
 
@@ -161,7 +164,7 @@ router.put("/leaves/:id/reject", auth, async (req, res) => {
       return res.status(404).json({ message: "Leave not found" });
     }
 
-    leave.status = "Rejected";
+    leave.status = "rejected";
 
     await leave.save();
 

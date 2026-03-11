@@ -8,6 +8,7 @@ const authRoutes = require("./routes/authRoutes");
 const leaveRoutes = require("./routes/leaveRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
+const User = require("./models/User");
 
 const app = express();
 
@@ -15,7 +16,7 @@ const app = express();
 MIDDLEWARE
 */
 app.use(cors({
-  origin: "*", // change to frontend domain in production
+  origin: "*",
   credentials: true
 }));
 
@@ -45,21 +46,47 @@ app.use((err, req, res, next) => {
 });
 
 /*
+CREATE DEFAULT ADMIN
+*/
+const createDefaultAdmin = async () => {
+
+  const adminExists = await User.findOne({ role: "admin" });
+
+  if (!adminExists) {
+
+    const admin = new User({
+      name: "Admin",
+      phone: "9877582893",
+      password: "admin123",
+      role: "admin"
+    });
+
+    await admin.save();
+
+    console.log("Default admin created");
+    console.log("Phone: 9877582893");
+    console.log("Password: admin123");
+  }
+
+};
+
+/*
 DATABASE CONNECTION
 */
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log("MongoDB connection failed:", err))
-.then(() => {
-  console.log("MongoDB Connected");
+  .then(async () => {
 
-  const PORT = process.env.PORT || 5000;
+    console.log("MongoDB Connected");
 
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    await createDefaultAdmin(); // ⭐ THIS WAS MISSING
+
+    const PORT = process.env.PORT || 5000;
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+
+  })
+  .catch((error) => {
+    console.error("MongoDB connection failed:", error);
   });
-
-})
-.catch((error) => {
-  console.error("MongoDB connection failed:", error);
-});

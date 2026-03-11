@@ -7,7 +7,6 @@ const authMiddleware = require("../middleware/authMiddleware");
 /*
 APPLY LEAVE
 POST /api/leaves/apply
-Employee creates a leave request
 */
 router.post("/apply", authMiddleware, async (req, res) => {
   try {
@@ -18,13 +17,13 @@ router.post("/apply", authMiddleware, async (req, res) => {
     }
 
     const leave = new Leave({
-      employee: req.user.id,
+      employee: req.user.id || req.user._id,
       leaveType,
       halfDayType,
       fromDate,
       toDate,
       reason,
-      status: "Pending"
+      status: "pending" // FIXED
     });
 
     const savedLeave = await leave.save();
@@ -39,13 +38,12 @@ router.post("/apply", authMiddleware, async (req, res) => {
 
 /*
 GET MY LEAVES
-GET /api/leaves/my
-Employee can view their leave history
 */
 router.get("/my", authMiddleware, async (req, res) => {
   try {
+
     const leaves = await Leave.find({
-      employee: req.user.id
+      employee: req.user.id || req.user._id
     })
       .populate("employee", "name phone")
       .sort({ createdAt: -1 });
@@ -53,8 +51,10 @@ router.get("/my", authMiddleware, async (req, res) => {
     res.json(leaves);
 
   } catch (error) {
+
     console.error(error);
     res.status(500).json({ message: "Error fetching leaves" });
+
   }
 });
 

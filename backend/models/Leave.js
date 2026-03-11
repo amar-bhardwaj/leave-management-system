@@ -4,7 +4,8 @@ const leaveSchema = new mongoose.Schema(
   {
     employee: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
+      ref: "User",
+      required: true
     },
 
     leaveType: {
@@ -15,14 +16,26 @@ const leaveSchema = new mongoose.Schema(
 
     halfDayType: {
       type: String,
-      enum: ["first-half", "second-half"]
+      enum: ["first-half", "second-half"],
+      required: function () {
+        return this.leaveType === "half-day";
+      }
     },
 
-    fromDate: Date,
+    fromDate: {
+      type: Date,
+      required: true
+    },
 
-    toDate: Date,
+    toDate: {
+      type: Date,
+      required: true
+    },
 
-    reason: String,
+    reason: {
+      type: String,
+      required: true
+    },
 
     status: {
       type: String,
