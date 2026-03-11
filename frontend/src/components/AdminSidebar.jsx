@@ -6,12 +6,11 @@ function AdminSidebar() {
   const navigate = useNavigate();
 
   const logout = () => {
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-
+    // localStorage.removeItem("token");
+    // localStorage.removeItem("role");
+    localStorage.clear();
+    window.location.href = "/login";
     navigate("/login");
-
   };
 
   const linkStyle = {

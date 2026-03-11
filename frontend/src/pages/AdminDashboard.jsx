@@ -31,7 +31,7 @@ function AdminDashboard() {
         );
 
         const leavesRes = await axios.get(
-          "http://localhost:5000/api/leaves/all",
+          "http://localhost:5000/api/admin/leaves",
           { headers }
         );
 

@@ -73,9 +73,9 @@ function Login() {
         }}
       >
 
-        <h2 style={{ textAlign: "center" }}>
-          Employee Login
-        </h2>
+        <h3 style={{ textAlign: "center" }}>
+          Saanvi Leave Management System Login
+        </h3>
 
         {error && (
           <p style={{ color: "red", fontSize: "14px" }}>

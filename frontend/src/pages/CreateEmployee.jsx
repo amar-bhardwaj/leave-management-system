@@ -7,7 +7,6 @@ function CreateEmployee() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("employee");
 
   const [message, setMessage] = useState("");
 
@@ -24,8 +23,7 @@ function CreateEmployee() {
         {
           name,
           phone,
-          password,
-          role
+          password
         },
         {
           headers: {
@@ -39,7 +37,6 @@ function CreateEmployee() {
       setName("");
       setPhone("");
       setPassword("");
-      setRole("employee");
 
     } catch (error) {
 
@@ -123,7 +120,7 @@ function CreateEmployee() {
             }}
           />
 
-          <select
+          {/* <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
             style={{
@@ -134,7 +131,7 @@ function CreateEmployee() {
           >
             <option value="employee">Employee</option>
             <option value="admin">Admin</option>
-          </select>
+          </select> */}
 
           <button
             type="submit"
