@@ -62,6 +62,7 @@ router.post("/employees", auth, async (req, res) => {
   }
 });
 
+
 /*
 DELETE EMPLOYEE
 DELETE /api/admin/employees/:id

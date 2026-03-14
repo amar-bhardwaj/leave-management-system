@@ -17,13 +17,13 @@ router.post("/apply", authMiddleware, async (req, res) => {
     }
 
     const leave = new Leave({
-      employee: req.user.id || req.user._id,
+      employee: req.user.id || req.user._id || req.user.userId,
       leaveType,
       halfDayType,
       fromDate,
       toDate,
       reason,
-      status: "pending" // FIXED
+      status: "pending" 
     });
 
     const savedLeave = await leave.save();
@@ -43,7 +43,7 @@ router.get("/my", authMiddleware, async (req, res) => {
   try {
 
     const leaves = await Leave.find({
-      employee: req.user.id || req.user._id
+      employee: req.user.id || req.user._id || req.user.userId
     })
       .populate("employee", "name phone")
       .sort({ createdAt: -1 });
