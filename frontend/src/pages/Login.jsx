@@ -31,6 +31,10 @@ function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
 
+      // Save employee details
+      localStorage.setItem("name", res.data.user.name);
+      localStorage.setItem("phone", res.data.user.phone);
+
       // Redirect based on role
       if (res.data.role === "admin") {
         navigate("/admin/dashboard");

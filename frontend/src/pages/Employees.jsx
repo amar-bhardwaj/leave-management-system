@@ -142,7 +142,7 @@ function Employees() {
 
         {/* CREATE EMPLOYEE */}
 
-        <h3>Add New Employee</h3>
+        {/* <h3>Add New Employee</h3>
 
         <form
           onSubmit={createEmployee}
@@ -177,7 +177,7 @@ function Employees() {
             Create
           </button>
 
-        </form>
+        </form> */}
 
 
         {/* EMPLOYEE TABLE */}

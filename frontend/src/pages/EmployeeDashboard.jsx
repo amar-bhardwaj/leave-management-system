@@ -11,9 +11,14 @@ function EmployeeDashboard() {
   const [toDate, setToDate] = useState("");
   const [reason, setReason] = useState("");
 
+
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem("token");
+
+  //token
+  const name = localStorage.getItem("name");
+  const phone = localStorage.getItem("phone");
 
   const headers = {
     Authorization: `Bearer ${token}`
@@ -106,7 +111,7 @@ function EmployeeDashboard() {
 
 
   if (loading) {
-    return <div style={{padding:"40px"}}>Loading dashboard...</div>;
+    return <div style={{ padding: "40px" }}>Loading dashboard...</div>;
   }
 
 
@@ -130,7 +135,13 @@ function EmployeeDashboard() {
         alignItems: "center"
       }}>
 
-        <h2>Employee Dashboard</h2>
+        <div>
+          <h2>Employee Dashboard</h2>
+          <p style={{ margin: 0 }}>
+            {/* Hi {name} ({phone}) */}
+            Hi {name ? `${name} (${phone})` : "Employee"}
+          </p>
+        </div>
 
         <button onClick={logout}>
           Logout
@@ -154,7 +165,7 @@ function EmployeeDashboard() {
 
             <select
               value={leaveType}
-              onChange={(e)=>setLeaveType(e.target.value)}
+              onChange={(e) => setLeaveType(e.target.value)}
             >
               <option value="full-day">Full Day</option>
               <option value="half-day">Half Day</option>
@@ -172,7 +183,7 @@ function EmployeeDashboard() {
 
               <select
                 value={halfDayType}
-                onChange={(e)=>setHalfDayType(e.target.value)}
+                onChange={(e) => setHalfDayType(e.target.value)}
               >
                 <option value="first-half">First Half</option>
                 <option value="second-half">Second Half</option>
@@ -191,7 +202,7 @@ function EmployeeDashboard() {
             <input
               type="date"
               value={fromDate}
-              onChange={(e)=>setFromDate(e.target.value)}
+              onChange={(e) => setFromDate(e.target.value)}
               required
             />
 
@@ -206,7 +217,7 @@ function EmployeeDashboard() {
             <input
               type="date"
               value={toDate}
-              onChange={(e)=>setToDate(e.target.value)}
+              onChange={(e) => setToDate(e.target.value)}
               required
             />
 
@@ -221,7 +232,7 @@ function EmployeeDashboard() {
             <input
               type="text"
               value={reason}
-              onChange={(e)=>setReason(e.target.value)}
+              onChange={(e) => setReason(e.target.value)}
               required
             />
 
@@ -230,7 +241,7 @@ function EmployeeDashboard() {
 
           <button
             type="submit"
-            style={{ marginTop:"10px" }}
+            style={{ marginTop: "10px" }}
           >
             Apply Leave
           </button>
@@ -263,7 +274,7 @@ function EmployeeDashboard() {
             {leaves.length === 0 && (
 
               <tr>
-                <td colSpan="5" style={{textAlign:"center"}}>
+                <td colSpan="5" style={{ textAlign: "center" }}>
                   No leave records
                 </td>
               </tr>
@@ -274,7 +285,13 @@ function EmployeeDashboard() {
 
               <tr key={leave._id}>
 
-                <td>{leave.leaveType}</td>
+                {/* <td>{leave.leaveType}</td> */}
+
+                <td>
+                  {leave.leaveType === "half-day"
+                    ? `Half Day (${leave.halfDayType === "first-half" ? "First Half" : "Second Half"})`
+                    : "Full Day"}
+                </td>
 
                 <td>
                   {new Date(leave.fromDate).toLocaleDateString()}
