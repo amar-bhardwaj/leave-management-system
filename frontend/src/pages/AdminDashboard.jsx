@@ -82,7 +82,7 @@ function AdminDashboard() {
         }}
       >
 
-        <h2 style={{ marginBottom: "30px" }}>
+        <h2 style={{ marginBottom: "30px", color: "black" }}>
           Admin Dashboard
         </h2>
 

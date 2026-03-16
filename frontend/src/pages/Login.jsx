@@ -77,7 +77,7 @@ function Login() {
         }}
       >
 
-        <h3 style={{ textAlign: "center" }}>
+        <h3 style={{ textAlign: "center", color: "black" }}>
           Saanvi Leave Management System Login
         </h3>
 

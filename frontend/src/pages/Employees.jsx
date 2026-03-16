@@ -7,9 +7,9 @@ function Employees() {
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
 
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
+  // const [name, setName] = useState("");
+  // const [phone, setPhone] = useState("");
+  // const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(true);
 
@@ -49,36 +49,36 @@ function Employees() {
 
 
   // CREATE EMPLOYEE
-  const createEmployee = async (e) => {
+  // const createEmployee = async (e) => {
 
-    e.preventDefault();
+  //   e.preventDefault();
 
-    try {
+  //   try {
 
-      await axios.post(
-        "http://localhost:5000/api/users/create",
-        { name, phone, password },
-        { headers }
-      );
+  //     await axios.post(
+  //       "http://localhost:5000/api/users/create",
+  //       { name, phone, password },
+  //       { headers }
+  //     );
 
-      alert("Employee created");
+  //     alert("Employee created");
 
-      setName("");
-      setPhone("");
-      setPassword("");
+  //     setName("");
+  //     setPhone("");
+  //     setPassword("");
 
-      fetchEmployees();
+  //     fetchEmployees();
 
-    } catch (error) {
+  //   } catch (error) {
 
-      alert(
-        error.response?.data?.message ||
-        "Error creating employee"
-      );
+  //     alert(
+  //       error.response?.data?.message ||
+  //       "Error creating employee"
+  //     );
 
-    }
+  //   }
 
-  };
+  // };
 
 
   // DELETE EMPLOYEE
