@@ -4,6 +4,7 @@ const User = require("../models/User");
 const authMiddleware = require("../middleware/authMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
 const bcrypt = require("bcryptjs");
+const Leave = require("../models/Leave");
 
 
 // GET ALL EMPLOYEES
@@ -19,6 +20,7 @@ router.get("/all", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Error fetching employees" });
   }
 });
+
 
 
 // CREATE EMPLOYEE
@@ -60,35 +62,83 @@ router.post("/create", authMiddleware, adminMiddleware, async (req, res) => {
 
 
 // DELETE EMPLOYEE
-router.delete("/delete/:id", authMiddleware, async (req, res) => {
+// router.delete("/delete/:id", authMiddleware, async (req, res) => {
+//   try {
+
+//     await User.findByIdAndDelete(req.params.id);
+
+//     res.json({ message: "Employee deleted successfully" });
+
+//   } catch (error) {
+//     res.status(500).json({ message: "Error deleting employee" });
+//   }
+// });
+
+router.delete("/delete/:id", async (req, res) => {
   try {
 
-    await User.findByIdAndDelete(req.params.id);
+    const userId = req.params.id;
 
-    res.json({ message: "Employee deleted successfully" });
+    // Delete all leave records of this employee
+    await Leave.deleteMany({ employee: userId });
+
+    // Delete employee
+    await User.findByIdAndDelete(userId);
+
+    res.json({
+      message: "Employee and their leave records deleted"
+    });
 
   } catch (error) {
-    res.status(500).json({ message: "Error deleting employee" });
+
+    console.log(error);
+
+    res.status(500).json({
+      message: "Delete failed"
+    });
+
   }
 });
 
 
 //PASSWORD RESET
-router.put("/reset-password/:id", authMiddleware, async (req, res) => {
+
+router.put("/reset-password", async (req, res) => {
 
   try {
 
-    const { password } = req.body;
+    const { phone, password } = req.body;
 
-    await User.findByIdAndUpdate(req.params.userId, {
-      password: newPassword
+    if (!phone || !password) {
+      return res.status(400).json({
+        message: "Phone and password required"
+      });
+    }
+
+    const user = await User.findOne({ phone });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Employee not found"
+      });
+    }
+
+    // DO NOT HASH HERE
+    user.password = password;
+
+    await user.save(); // pre-save middleware will hash it
+
+    res.json({
+      message: "Password reset successful"
     });
-
-    res.json({ message: "Password reset successful" });
 
   } catch (error) {
 
-    res.status(500).json({ message: "Error resetting password" });
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server error"
+    });
 
   }
 
