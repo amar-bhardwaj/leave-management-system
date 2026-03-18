@@ -3,12 +3,14 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const bcrypt = require("bcryptjs");
 
 const authRoutes = require("./routes/authRoutes");
 const leaveRoutes = require("./routes/leaveRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
 const User = require("./models/User");
+
 
 const app = express();
 
@@ -50,24 +52,43 @@ CREATE DEFAULT ADMIN
 */
 const createDefaultAdmin = async () => {
 
-  const adminExists = await User.findOne({ role: "admin" });
-
-  if (!adminExists) {
-
-    const admin = new User({
-      name: "Admin",
+  const admins = [
+    {
+      name: "Amar Bhardwaj",
       phone: "9877582893",
-      password: "admin123",
-      role: "admin"
-    });
+      password: "admin123"
+    },
+    {
+      name: "Yogesh Gupta",
+      phone: "7006752209",
+      password: "Saanvi@9871234"
+    }
+  ];
 
-    await admin.save();
+  for (let adminData of admins) {
 
-    console.log("Default admin created");
-    console.log("Phone: 9877582893");
-    console.log("Password: admin123");
+    const exists = await User.findOne({ phone: adminData.phone });
+
+    if (!exists) {
+
+      const hashedPassword = await bcrypt.hash(adminData.password, 10);
+
+      const admin = new User({
+        name: adminData.name,
+        phone: adminData.phone,
+        password: hashedPassword,
+        role: "admin"
+      });
+
+      await admin.save();
+
+      console.log(`✅ Admin created: ${adminData.phone}`);
+
+    } else {
+      console.log(`ℹ️ Admin already exists: ${adminData.phone}`);
+    }
+
   }
-
 };
 
 /*
