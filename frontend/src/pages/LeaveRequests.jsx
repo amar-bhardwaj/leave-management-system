@@ -17,7 +17,7 @@ function LeaveRequests() {
 
   const perPage = 5;
 
-  // FETCH LEAVES
+  // FETCH LEAVE
   const fetchLeaves = async () => {
 
     try {
