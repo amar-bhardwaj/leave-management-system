@@ -152,7 +152,7 @@ router.put("/leaves/:id/approve", auth, async (req, res) => {
 });
 
 /*
-REJECT LEAVE
+REJECT LEAVEs
 PUT /api/admin/leaves/:id/reject
 */
 router.put("/leaves/:id/reject", auth, async (req, res) => {
